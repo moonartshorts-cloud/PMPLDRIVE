@@ -1,0 +1,65 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width,initial-scale=1" />
+<title>Card - Folder Data App</title>
+<link rel="stylesheet" href="style.css">
+</head>
+<body class="app">
+<div class="sidebar">
+  <div class="sidebar-top">
+    <div class="logo-sm">FD</div>
+    <h2>Folder Data</h2>
+  </div>
+
+  <nav class="nav" id="sidebarNav">
+    <a class="nav-item" onclick="goHome()">Dashboard</a>
+    <a class="nav-item" id="nav-1" onclick="goTo('card.html',1)">CLZS</a>
+    <a class="nav-item" id="nav-2" onclick="goTo('card.html',2)">MEL</a>
+    <a class="nav-item" id="nav-3" onclick="goTo('card.html',3)">MPGL</a>
+    <a class="nav-item" id="nav-4" onclick="goTo('card.html',4)">STPP</a>
+    <a class="nav-item" id="nav-5" onclick="goTo('card.html',5)">TSPL</a>
+  </nav>
+
+  <div class="sidebar-bottom">
+    <button class="btn ghost" onclick="logout()">Logout</button>
+  </div>
+</div>
+
+<div class="main">
+  
+  <div class="back-container">
+    <button class="btn-back" onclick="goBack()">
+      <span>←</span> Back
+    </button>
+  </div>
+
+  <header class="topbar">
+    <div class="title">
+      <h3 id="cardTitle">Card</h3>
+      <p id="cardSubtitle" class="muted">Details and folders</p>
+    </div>
+    <div class="top-actions">
+      </div>
+  </header>
+
+  <section class="content">
+    <div id="foldersArea"></div>
+  </section>
+</div>
+
+<div id="folderModal" class="modal hidden">
+  <div class="modal-panel">
+    <h4>Create folder</h4>
+    <input id="folderInput" placeholder="Folder name" />
+    <div class="modal-actions">
+      <button class="btn" onclick="createFolder()">Create</button>
+      <button class="btn ghost" onclick="closeFolderModal()">Cancel</button>
+    </div>
+  </div>
+</div>
+
+<script src="script.js"></script>
+</body>
+</html>
