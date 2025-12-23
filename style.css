@@ -24,11 +24,10 @@ body {
   
   /* --- BACKGROUND SETUP --- */
   background: 
-    /* UPDATED: Reduced overlay from 0.5 to 0.25 (Less white, more clear image) */
-    linear-gradient(rgba(255, 255, 255, 0.25), rgba(255, 255, 255, 0.25)),
+    linear-gradient(rgba(255, 255, 255, 0.25), rgba(255, 255, 255, 0.25)), /* 25% White Overlay */
     url('image.png'); /* The Saraswati Image */
   
-  /* Keeps image proportionate in center */
+  /* Fits image in center without stretching */
   background-size: contain;
   
   background-position: center center;
@@ -36,7 +35,7 @@ body {
   background-repeat: no-repeat;
   min-height: 100vh;
   
-  /* Dark background color for outer space */
+  /* Fill outer space with dark blue */
   background-color: #0f1724;
 }
 
@@ -214,15 +213,16 @@ body {
 .visual-side { text-align: center; transition: all 0.5s ease; transform: translateX(0); flex: 1; }
 .app-title { font-size: 48px; color: #ffffff; margin-bottom: 20px; font-weight: 700; text-shadow: 0 2px 10px rgba(0,0,0,0.3); }
 
-/* Central God Image (Login Page) */
+/* Central God Image */
 .god-image-box { width: 300px; height: 300px; margin: 0 auto; display: flex; align-items: center; justify-content: center; }
 
-/* UPDATED: Added padding-right: 20px for spacing */
+/* CSS FIX: Use 'content' to force load image if HTML src is broken */
 .god-img { 
-  height: 80px; 
-  width: 40px; 
+  content: url('image.png'); /* Magic fix for broken HTML path */
+  height: 400px; 
+  width: auto; 
   object-fit: contain; 
-  padding-left: 800px; /* Added Padding */
+  padding-right: 20px; 
   filter: drop-shadow(0 10px 15px rgba(0,0,0,0.1)); 
 }
 
