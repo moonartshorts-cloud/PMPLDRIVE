@@ -1,23 +1,39 @@
 // ==========================================
 // 1. GLOBAL SETTINGS & DATA
 // ==========================================
+
+// Default data to populate if storage is empty
 const defaultCards = [
   {id:1,name:'CLZS'}, {id:2,name:'MEL'}, {id:3,name:'MPGL'}, {id:4,name:'STPP'}, {id:5,name:'TSPL'}
 ];
 
+// Initialize LocalStorage if empty
 if(!localStorage.getItem('cards')) localStorage.setItem('cards', JSON.stringify(defaultCards));
 if(!localStorage.getItem('folders')) localStorage.setItem('folders', JSON.stringify([]));
 if(!localStorage.getItem('rootFiles')) localStorage.setItem('rootFiles', JSON.stringify([]));
 
 // ==========================================
-// 2. AUTHENTICATION
+// 2. LOGIN PAGE LOGIC
 // ==========================================
+
+// Animation for the new Login Page
+function toggleLoginView() {
+  const container = document.getElementById('mainContainer');
+  if(container) {
+    container.classList.toggle('active');
+  }
+}
+
 function login(){
   const u = document.getElementById('username').value;
   const p = document.getElementById('password').value;
-  if(u==='ADMIN' && p==='ADMIN'){ window.location = 'home.html'; }
-  else alert('Invalid credentials');
+  if(u==='ADMIN' && p==='ADMIN'){ 
+    window.location = 'home.html'; 
+  } else { 
+    alert('Invalid credentials'); 
+  }
 }
+
 function logout(){
   localStorage.removeItem('currentCard');
   localStorage.removeItem('currentFolderId');
@@ -25,17 +41,51 @@ function logout(){
 }
 
 // ==========================================
-// 3. NAVIGATION & DASHBOARD
+// 3. SHARED FUNCTIONS (Sidebar & Navigation)
 // ==========================================
+
+// Dynamically render the sidebar menu
+function renderSidebar(){
+  const nav = document.getElementById('sidebarNav');
+  if(!nav) return; 
+
+  const cards = JSON.parse(localStorage.getItem('cards'));
+  const currentCardId = localStorage.getItem('currentCard');
+  const isHome = window.location.pathname.includes('home.html');
+
+  nav.innerHTML = ''; 
+
+  // 1. Dashboard Link
+  const dashBtn = document.createElement('a');
+  dashBtn.className = `nav-item ${isHome ? 'active' : ''}`;
+  dashBtn.innerText = 'Dashboard';
+  dashBtn.onclick = () => goHome();
+  nav.appendChild(dashBtn);
+
+  // 2. Card Links
+  cards.forEach(c => {
+    const btn = document.createElement('a');
+    const isActive = !isHome && c.id == currentCardId;
+    btn.className = `nav-item ${isActive ? 'active' : ''}`;
+    btn.innerText = c.name;
+    btn.onclick = () => goTo('card.html', c.id);
+    nav.appendChild(btn);
+  });
+}
+
 function goHome(){ window.location = 'home.html'; }
 
 function goTo(url, cardId){
   if(cardId) {
     localStorage.setItem('currentCard', cardId);
-    localStorage.removeItem('currentFolderId'); // Reset folder when switching cards
+    localStorage.removeItem('currentFolderId');
   }
   window.location = url;
 }
+
+// ==========================================
+// 4. HOME PAGE (DASHBOARD)
+// ==========================================
 
 function openCreateCard(){ document.getElementById('modal').classList.remove('hidden'); }
 function closeModal(){ document.getElementById('modal').classList.add('hidden'); }
@@ -47,7 +97,10 @@ function createCard(){
   const id = Date.now();
   cards.unshift({id, name});
   localStorage.setItem('cards', JSON.stringify(cards));
-  closeModal(); renderCards();
+  
+  closeModal(); 
+  renderCards();
+  renderSidebar(); // Update sidebar immediately
 }
 
 function renderCards(filter){
@@ -56,20 +109,53 @@ function renderCards(filter){
   if(!grid) return;
   const q = (filter||'').toLowerCase();
   grid.innerHTML = '';
+  
   cards.filter(c=>c.name.toLowerCase().includes(q)).forEach(c=>{
     const el = document.createElement('div');
     el.className = 'card-ui';
-    el.innerHTML = `<div class="card-header"><div class="card-icon">${c.name.charAt(0)}</div><div><div class="card-title">${c.name}</div><div class="card-sub">Click to open</div></div></div>`;
-    el.onclick = ()=>{ goTo('card.html', c.id); };
+    
+    el.innerHTML = `
+      <button class="card-delete-btn" onclick="deleteCard(event, ${c.id})" title="Delete Card">×</button>
+      <div class="card-header">
+        <div class="card-icon">${c.name.charAt(0)}</div>
+        <div>
+            <div class="card-title">${c.name}</div>
+            <div class="card-sub">Click to open</div>
+        </div>
+      </div>
+    `;
+    el.onclick = (e)=>{ 
+       // Prevent navigation if clicking the delete button
+       if(e.target.tagName === 'BUTTON' || e.target.closest('.card-delete-btn')) return;
+       goTo('card.html', c.id); 
+    };
     grid.appendChild(el);
   });
 }
-function filterCards(){ const q=document.getElementById('search').value||''; renderCards(q); }
-if(window.location.pathname.includes('home.html')){ renderCards(); }
 
+function deleteCard(e, id){
+  e.stopPropagation(); 
+  if(confirm("Are you sure? This will delete the Card and ALL its files/folders.")){
+    let cards = JSON.parse(localStorage.getItem('cards'));
+    cards = cards.filter(c => c.id != id);
+    localStorage.setItem('cards', JSON.stringify(cards));
+
+    // Clean up associated data (folders & files)
+    let folders = JSON.parse(localStorage.getItem('folders')).filter(f => f.cardId != id);
+    localStorage.setItem('folders', JSON.stringify(folders));
+    
+    let rootFiles = JSON.parse(localStorage.getItem('rootFiles')).filter(f => f.cardId != id);
+    localStorage.setItem('rootFiles', JSON.stringify(rootFiles));
+
+    renderCards();
+    renderSidebar(); // Update sidebar immediately
+  }
+}
+
+function filterCards(){ const q=document.getElementById('search').value||''; renderCards(q); }
 
 // ==========================================
-// 4. CARD DETAILS PAGE logic
+// 5. CARD DETAILS PAGE LOGIC
 // ==========================================
 
 function goBack(){
@@ -79,13 +165,9 @@ function goBack(){
     localStorage.removeItem('currentFolderId');
     renderCardView();
   } else {
-    // If in Card Root, go back to Home
+    // If at Card Root, go back to Dashboard
     window.location='home.html';
   }
-}
-
-if(window.location.pathname.includes('card.html')){
-  renderCardView();
 }
 
 function renderCardView() {
@@ -94,18 +176,14 @@ function renderCardView() {
   const cards = JSON.parse(localStorage.getItem('cards'));
   const card = cards.find(c=>c.id==cardId) || {name:'Untitled'};
   
-  // 1. Highlight Sidebar Item (NEW)
-  document.querySelectorAll('.nav-item').forEach(el => el.classList.remove('active'));
-  const activeNav = document.getElementById('nav-'+cardId);
-  if(activeNav) activeNav.classList.add('active');
+  renderSidebar(); // Ensure sidebar highlighting is correct
 
-  // 2. Update Titles & Buttons
   const titleEl = document.getElementById('cardTitle');
   const subEl = document.getElementById('cardSubtitle');
   const actionBtn = document.querySelector('.top-actions'); 
 
   if (folderId) {
-    // --- INSIDE FOLDER ---
+    // --- SCENARIO A: INSIDE A SPECIFIC FOLDER ---
     const folders = JSON.parse(localStorage.getItem('folders'));
     const folder = folders.find(f=>f.id==folderId);
     titleEl.innerText = `${card.name} / ${folder.name}`;
@@ -118,7 +196,7 @@ function renderCardView() {
     renderFolderContents(folder);
     
   } else {
-    // --- CARD ROOT ---
+    // --- SCENARIO B: AT CARD ROOT (MIXED VIEW) ---
     titleEl.innerText = card.name;
     subEl.innerText = "Folders and Files";
     
@@ -146,6 +224,7 @@ function renderMixedCardContent(cardId) {
   const folders = JSON.parse(localStorage.getItem('folders')).filter(f=>f.cardId==cardId);
   const rootFiles = JSON.parse(localStorage.getItem('rootFiles')).filter(f=>f.cardId==cardId);
 
+  // Render Folders
   folders.forEach(f => {
     const el = document.createElement('div');
     el.className = 'folder-square';
@@ -164,6 +243,7 @@ function renderMixedCardContent(cardId) {
     grid.appendChild(el);
   });
 
+  // Render Root Files
   rootFiles.forEach(f => {
     const el = document.createElement('div');
     el.className = 'file-square';
@@ -208,12 +288,19 @@ function renderFolderContents(folder) {
     `;
     grid.appendChild(el);
   });
+  
   area.appendChild(grid);
 }
 
-// --- ACTIONS ---
+// ==========================================
+// 6. ACTIONS & CRUD OPERATIONS
+// ==========================================
 
-function enterFolder(folderId) { localStorage.setItem('currentFolderId', folderId); renderCardView(); }
+function enterFolder(folderId) { 
+  localStorage.setItem('currentFolderId', folderId); 
+  renderCardView(); 
+}
+
 function showNewFolder(){ document.getElementById('folderModal').classList.remove('hidden'); }
 function closeFolderModal(){ document.getElementById('folderModal').classList.add('hidden'); }
 
@@ -228,72 +315,112 @@ function createFolder(){
   renderCardView();
 }
 
-// Rename/Delete Functions
-function renameFolder(id) {
+// --- FOLDER CRUD ---
+function renameFolder(id) { 
   const folders = JSON.parse(localStorage.getItem('folders'));
   const f = folders.find(x=>x.id==id);
   const n = prompt("New name:", f.name);
-  if(n){ f.name=n.trim(); localStorage.setItem('folders', JSON.stringify(folders)); renderCardView(); }
-}
-function deleteFolder(id) {
-  if(confirm("Delete folder?")){
-    const folders = JSON.parse(localStorage.getItem('folders')).filter(x=>x.id!=id);
-    localStorage.setItem('folders', JSON.stringify(folders));
-    renderCardView();
+  if(n){ 
+    f.name=n.trim(); 
+    localStorage.setItem('folders', JSON.stringify(folders)); 
+    renderCardView(); 
   }
 }
-function uploadFileToFolder(folderId, file) {
+
+function deleteFolder(id) { 
+  if(confirm("Delete folder?")){ 
+    const folders = JSON.parse(localStorage.getItem('folders')).filter(x=>x.id!=id); 
+    localStorage.setItem('folders', JSON.stringify(folders)); 
+    renderCardView(); 
+  }
+}
+
+// --- FILE CRUD (Inside Folders) ---
+function uploadFileToFolder(folderId, file) { 
   if(!file) return;
-  if(file.size > 2000000) return alert("Max 2MB for demo");
-  const reader = new FileReader();
-  reader.onload = e => {
+  if(file.size > 2000000) return alert("File too large (Max 2MB)"); 
+  const reader = new FileReader(); 
+  reader.onload = e => { 
     const folders = JSON.parse(localStorage.getItem('folders'));
     const f = folders.find(x=>x.id==folderId);
     if(!f.files) f.files = [];
-    f.files.unshift({name: file.name, data: e.target.result});
-    localStorage.setItem('folders', JSON.stringify(folders));
-    renderCardView();
-  };
-  reader.readAsDataURL(file);
+    f.files.unshift({name:file.name, data:e.target.result}); 
+    localStorage.setItem('folders', JSON.stringify(folders)); 
+    renderCardView(); 
+  }; 
+  reader.readAsDataURL(file); 
 }
-function renameFileInFolder(fid, idx) {
+
+function renameFileInFolder(fid, idx) { 
   const folders = JSON.parse(localStorage.getItem('folders'));
-  const f = folders.find(x=>x.id==fid);
-  const n = prompt("Rename file:", f.files[idx].name);
-  if(n){ f.files[idx].name=n.trim(); localStorage.setItem('folders', JSON.stringify(folders)); renderCardView(); }
+  const f = folders.find(x=>x.id==fid); 
+  const n = prompt("Rename:", f.files[idx].name); 
+  if(n){ 
+    f.files[idx].name=n; 
+    localStorage.setItem('folders', JSON.stringify(folders)); 
+    renderCardView(); 
+  }
 }
-function deleteFileInFolder(fid, idx) {
-  if(confirm("Delete file?")){
+
+function deleteFileInFolder(fid, idx) { 
+  if(confirm("Delete file?")){ 
     const folders = JSON.parse(localStorage.getItem('folders'));
-    const f = folders.find(x=>x.id==fid);
-    f.files.splice(idx,1);
-    localStorage.setItem('folders', JSON.stringify(folders));
-    renderCardView();
+    const f = folders.find(x=>x.id==fid); 
+    f.files.splice(idx,1); 
+    localStorage.setItem('folders', JSON.stringify(folders)); 
+    renderCardView(); 
   }
 }
-function uploadFileToCardRoot(file) {
+
+// --- FILE CRUD (Root of Card) ---
+function uploadFileToCardRoot(file) { 
   if(!file) return;
-  if(file.size > 2000000) return alert("Max 2MB for demo");
-  const reader = new FileReader();
-  reader.onload = e => {
+  if(file.size > 2000000) return alert("File too large (Max 2MB)");
+  const reader = new FileReader(); 
+  reader.onload = e => { 
     const rootFiles = JSON.parse(localStorage.getItem('rootFiles'));
-    const cardId = localStorage.getItem('currentCard');
-    rootFiles.unshift({id: Date.now(), cardId: cardId, name: file.name, data: e.target.result});
-    localStorage.setItem('rootFiles', JSON.stringify(rootFiles));
-    renderCardView();
-  };
-  reader.readAsDataURL(file);
+    rootFiles.unshift({
+      id: Date.now(), 
+      cardId: localStorage.getItem('currentCard'), 
+      name: file.name, 
+      data: e.target.result
+    }); 
+    localStorage.setItem('rootFiles', JSON.stringify(rootFiles)); 
+    renderCardView(); 
+  }; 
+  reader.readAsDataURL(file); 
 }
-function renameRootFile(id) {
+
+function renameRootFile(id) { 
   const rootFiles = JSON.parse(localStorage.getItem('rootFiles'));
-  const f = rootFiles.find(x=>x.id==id);
-  const n = prompt("Rename file:", f.name);
-  if(n){ f.name=n.trim(); localStorage.setItem('rootFiles', JSON.stringify(rootFiles)); renderCardView(); }
-}
-function deleteRootFile(id) {
-  if(confirm("Delete file?")){
-    const rootFiles = JSON.parse(localStorage.getItem('rootFiles')).filter(x=>x.id!=id);
-    localStorage.setItem('rootFiles', JSON.stringify(rootFiles));
-    renderCardView();
+  const f = rootFiles.find(x=>x.id==id); 
+  const n = prompt("Rename:", f.name); 
+  if(n){ 
+    f.name=n; 
+    localStorage.setItem('rootFiles', JSON.stringify(rootFiles)); 
+    renderCardView(); 
   }
+}
+
+function deleteRootFile(id) { 
+  if(confirm("Delete file?")){ 
+    const rootFiles = JSON.parse(localStorage.getItem('rootFiles')).filter(x=>x.id!=id); 
+    localStorage.setItem('rootFiles', JSON.stringify(rootFiles)); 
+    renderCardView(); 
+  }
+}
+
+// ==========================================
+// 7. INITIALIZATION
+// ==========================================
+// Check which page we are on and run appropriate functions
+
+if(document.getElementById('sidebarNav')) renderSidebar();
+
+if(window.location.pathname.includes('home.html')) {
+  renderCards();
+}
+
+if(window.location.pathname.includes('card.html')) {
+  renderCardView();
 }

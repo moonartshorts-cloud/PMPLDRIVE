@@ -3,31 +3,71 @@
 <head>
 <meta charset="utf-8" />
 <meta name="viewport" content="width=device-width,initial-scale=1" />
-<title>Login - Folder Data App</title>
+<title>Gyan Pravah - Login</title>
 <link rel="stylesheet" href="style.css">
+<style>
+  /* Glassy Blue Footer Style */
+  .glass-footer {
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    width: 100%;
+    padding: 15px;
+    text-align: center;
+    background: rgba(0, 24, 39, 0.6); /* Dark blue tint transparent */
+    backdrop-filter: blur(10px);          /* Glass blur effect */
+    border-top: 1px solid rgba(255, 255, 255, 0.1);
+    color: rgba(255, 255, 255, 0.8);      /* White text with opacity */
+    font-size: 13px;
+    z-index: 20;
+  }
+</style>
 </head>
-<body class="bg-gray">
-<main class="centered-card">
-  <div class="login-panel">
-    <div class="brand">
-      <div class="logo">FD</div>
-      <div>
-        <h1>Folder Data</h1>
-        <p class="muted">Secure access</p>
+<body class="bg-gradient-blue">
+
+<header class="login-header">
+  <div class="header-logo">
+    <img src="logo.png" alt="Gyan Pravah Logo" class="logo-img">
+  </div>
+  <button class="btn-header-login" onclick="toggleLoginView()">Login</button>
+</header>
+
+<main class="landing-wrapper">
+  <div class="split-container" id="mainContainer">
+    
+    <div class="visual-side">
+      <h1 class="app-title">Gyan Pravah</h1>
+      <div class="god-image-box">
+        <img src="image.png" class="god-img" alt="Saraswati">
       </div>
     </div>
 
-    <div class="form">
-      <label>Username</label>
-      <input id="username" placeholder="ADMIN" autofocus />
-      <label>Password</label>
-      <input id="password" type="password" placeholder="ADMIN" />
-      <button class="btn primary" onclick="login()">Sign in</button>
-      <div class="help muted">Use <b>ADMIN</b> / <b>ADMIN</b></div>
+    <div class="form-side">
+      <div class="login-box-inner">
+        <h2>Welcome</h2>
+        <p class="muted">Please enter your details</p>
+        
+        <div class="form-group">
+          <label>Username</label>
+          <input id="username" placeholder="ADMIN" />
+        </div>
+        
+        <div class="form-group">
+          <label>Password</label>
+          <input id="password" type="password" placeholder="ADMIN" />
+        </div>
+
+        <button class="btn primary full-width" onclick="login()">Sign in</button>
+        <div class="help muted small">Use <b>ADMIN</b> / <b>ADMIN</b></div>
+      </div>
     </div>
-    <footer class="muted small">© Folder Data • Clean Dashboard UI</footer>
+
   </div>
 </main>
+
+<footer class="glass-footer">
+  &copy; 2025 Gyan Pravah. All rights reserved.
+</footer>
 
 <script src="script.js"></script>
 </body>

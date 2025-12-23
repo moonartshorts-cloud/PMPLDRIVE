@@ -9,18 +9,13 @@
 <body class="app">
 <div class="sidebar">
   <div class="sidebar-top">
-    <div class="logo-sm">FD</div>
+    <div class="logo-container">
+      <img src="logo.png" alt="Logo" class="logo-sm-img">
+    </div>
     <h2>Folder Data</h2>
   </div>
 
-  <nav class="nav">
-    <a class="nav-item active">Dashboard</a>
-    <a class="nav-item" onclick="goTo('card.html',1)">CLZS</a>
-    <a class="nav-item" onclick="goTo('card.html',2)">MEL</a>
-    <a class="nav-item" onclick="goTo('card.html',3)">MPGL</a>
-    <a class="nav-item" onclick="goTo('card.html',4)">STPP</a>
-    <a class="nav-item" onclick="goTo('card.html',5)">TSPL</a>
-  </nav>
+  <nav class="nav" id="sidebarNav"></nav>
 
   <div class="sidebar-bottom">
     <button class="btn ghost" onclick="logout()">Logout</button>
