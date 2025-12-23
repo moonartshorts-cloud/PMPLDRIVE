@@ -82,6 +82,7 @@ body {
 .nav .nav-item:first-child {
   position: sticky;
   top: 0;
+  margin-bottom: 8px;
   z-index: 5;
 
   /* match sidebar look */
@@ -126,8 +127,8 @@ body {
   padding: 20px;
   display: flex; 
   flex-direction: column;
-  background: rgba(10, 35, 60, 0.85); /* Light Blue Glassy Tint */
-  backdrop-filter: blur(5px);
+  background: rgba(6, 5, 109, 0.322); /* Light Blue Glassy Tint */
+  backdrop-filter: blur(2px);
 }
 
 
