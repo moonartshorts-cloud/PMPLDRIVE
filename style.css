@@ -241,7 +241,7 @@ body {
   height: 400px; 
   width: auto; 
   object-fit: contain; 
-  padding-right: 20px; 
+  padding-right: 0px; 
   filter: drop-shadow(0 10px 15px rgba(0,0,0,0.1)); 
 }
 
