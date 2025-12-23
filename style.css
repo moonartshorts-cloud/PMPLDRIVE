@@ -26,9 +26,7 @@ body {
     linear-gradient(rgba(255, 255, 255, 0), rgb(255, 255, 255)),
     url('image.png');
 
-  /* 'auto 90%' prevents wide stretching on desktop */
   background-size: auto 90%; 
-  
   background-position: center center;
   background-repeat: no-repeat;
 
@@ -193,9 +191,9 @@ body {
 /* Utils */
 .hidden-input { display: none; }
 .back-container { margin-bottom: 10px; }
-.btn-back { background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.1); color: var(--muted); padding: 6px 12px; border-radius: 6px; cursor: pointer; display: inline-flex; align-items: center; gap: 6px; font-size: 13px; transition: all 0.2s; }
+.btn-back { background: transparent; border: 1px solid rgba(255,255,255,0.1); color: var(--muted); padding: 6px 12px; border-radius: 6px; cursor: pointer; display: inline-flex; align-items: center; gap: 6px; font-size: 13px; transition: all 0.2s; }
 .btn-back span { font-size: 16px; line-height: 1; }
-.btn-back:hover { background: rgba(255,255,255,0.15); color: var(--white); border-color: rgba(255,255,255,0.3); }
+.btn-back:hover { background: rgba(255,255,255,0.05); color: var(--white); border-color: rgba(255,255,255,0.2); }
 
 /* Modal & Login Specifics */
 .hidden { display: none !important; }
@@ -210,7 +208,20 @@ body {
   overflow: hidden;
   color: var(--text-dark);
 }
-.login-header { position: absolute; top: 0; left: 0; width: 100%; padding: 20px 40px; display: flex; justify-content: space-between; align-items: center; z-index: 10; }
+
+/* LOGIN HEADER POSITIONING */
+.login-header { 
+  position: absolute; 
+  top: 30px; 
+  left: 0; 
+  width: 100%; 
+  padding: 0 40px; 
+  display: flex; 
+  justify-content: space-between; 
+  align-items: center; 
+  z-index: 10; 
+}
+
 .header-logo { display: flex; align-items: center; padding: 0; }
 .logo-img { height: 80px; width: auto; object-fit: contain; }
 .btn-header-login { padding: 10px 24px; background: white; border: 2px solid var(--accent); color: var(--accent); font-weight: 600; cursor: pointer; border-radius: 6px; transition: all 0.2s; }
@@ -225,7 +236,7 @@ body {
 .god-image-box { width: 300px; height: 300px; margin: 0 auto; display: flex; align-items: center; justify-content: center; }
 
 .god-img { 
-  content: url('image.png');
+  content: url('image.png'); /* Magic fix for broken HTML path */
   height: 400px; 
   width: auto; 
   object-fit: contain; 
@@ -276,9 +287,10 @@ body {
   .landing-wrapper {
     height: auto;
     min-height: 100vh;
-    padding-top: 100px;
+    /* UPDATED: Increased padding to push login box lower on mobile */
+    padding-top: 180px; 
     padding-bottom: 50px;
-    align-items: flex-start; /* Avoid center alignment pushing content off screen */
+    align-items: flex-start;
   }
 
   .split-container {
