@@ -62,7 +62,7 @@ body {
 .logo-container {
   display: flex;
   align-items: center;
-  justify-content: center;
+  justify-content: left;
   margin-bottom: 6px;
   width: 100%;
 }
@@ -303,7 +303,7 @@ body {
   .visual-side {
     width: 100%;
     transform: none !important;
-    margin-bottom: 20px;
+    margin-bottom: 10px;
     transition: opacity 0.3s;
   }
 
@@ -337,4 +337,72 @@ body {
     from { opacity: 0; transform: translateY(10px); }
     to { opacity: 1; transform: translateY(0); }
   }
+}
+
+/* =========================================
+   8. UPLOAD PROGRESS TOAST
+   ========================================= */
+.upload-toast {
+  position: fixed;
+  bottom: 20px;
+  right: 20px;
+  width: 260px;
+  background: rgba(15, 23, 36, 0.85); /* Dark semi-transparent */
+  backdrop-filter: blur(8px);
+  border: 1px solid rgba(255,255,255,0.1);
+  border-radius: 10px;
+  padding: 12px;
+  color: #fff;
+  z-index: 1000;
+  box-shadow: 0 10px 30px rgba(0,0,0,0.4);
+  font-family: Inter, sans-serif;
+  font-size: 13px;
+  
+  /* Hidden by default */
+  opacity: 0;
+  pointer-events: none;
+  transform: translateY(20px);
+  transition: all 0.3s ease;
+}
+
+.upload-toast.show {
+  opacity: 1;
+  pointer-events: auto;
+  transform: translateY(0);
+}
+
+.progress-header {
+  display: flex;
+  justify-content: space-between;
+  margin-bottom: 8px;
+  align-items: center;
+}
+
+.progress-filename {
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  max-width: 180px;
+  color: #e2e8f0;
+}
+
+.progress-percent {
+  font-weight: 700;
+  color: #4f46e5; /* Accent color */
+  font-size: 12px;
+}
+
+.progress-bar-bg {
+  width: 100%;
+  height: 4px;
+  background: rgba(255,255,255,0.1);
+  border-radius: 2px;
+  overflow: hidden;
+}
+
+.progress-bar-fill {
+  height: 100%;
+  background: linear-gradient(90deg, #4f46e5, #818cf8);
+  width: 0%;
+  transition: width 0.1s linear;
 }
